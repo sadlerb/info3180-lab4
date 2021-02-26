@@ -9,6 +9,8 @@ from app import app
 from flask import render_template, request, redirect, url_for, flash, session, abort
 from werkzeug.utils import secure_filename
 from app.forms import UploadForm
+from flask.helpers import send_from_directory
+import sys
 
 
 
@@ -64,7 +66,28 @@ def login():
             return redirect(url_for('upload'))
     return render_template('login.html', error=error)
 
+@app.route('/uploads/<filename>')
+def get_image(filename):
+    root_dir = os.getcwd()
+    return send_from_directory(os.path.join(root_dir,app.config['UPLOAD_FOLDER']),filename)
 
+@app.route('/files')
+def files():
+    images = get_uploaded_images()
+    return render_template('files.html',images=images)
+
+def get_uploaded_images():
+    imageLocations = []
+    rootdir = os.getcwd()
+    
+    for subdir,dirs,files in os.walk(rootdir + '\\uploads\\'):
+        for file in files:
+            if ".jpg" in file or ".png" in file:
+                imageLocations.append(file)
+    return imageLocations
+
+
+    
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
