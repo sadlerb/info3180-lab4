@@ -33,6 +33,8 @@ def about():
 @app.route('/upload', methods=['POST', 'GET'])
 def upload():
     uploadForm = UploadForm()
+    if not session.get('logged_in'):
+        abort(401)
     if request.method == 'GET':
         return render_template('upload.html',form=uploadForm)
     
@@ -73,6 +75,8 @@ def get_image(filename):
 
 @app.route('/files')
 def files():
+    if not session.get('logged_in'):
+        abort(401)
     images = get_uploaded_images()
     return render_template('files.html',images=images)
 
